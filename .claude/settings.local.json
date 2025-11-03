@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(..venvScriptsActivate.ps1)",
+      "Bash(python -m pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(set PYTHONPATH=C:Userssoumyprojectspsychiatric-recordsbackend:*)",
+      "Bash(python:*)",
+      "Bash(timeout 5 python:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

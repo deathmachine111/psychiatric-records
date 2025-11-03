@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "afterFileEdit": "pytest tests/ -v --maxfail=1 --tb=short"
+  },
+  "testCommand": "pytest tests/ -v --cov=backend/app --cov-report=term-missing",
+  "pythonPath": ".venv/Scripts/python.exe"
+}
