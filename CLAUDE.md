@@ -49,7 +49,41 @@ Phase 9: Polish & Documentation
 
 **NEVER skip phases. NEVER work on Phase N+1 before Phase N is complete and tested.**
 
-### 4. **Checkpoint System**
+### 4. **Expert Debugging & Root Cause Analysis**
+When a bug emerges, follow this discipline:
+
+**Ask Deep Questions:**
+- What is the actual value/state at point X in execution?
+- When does this code run relative to other code?
+- What module-level state exists? When is it initialized?
+- What order does initialization happen in?
+- Is there a state mismatch between test setup and runtime?
+
+**Trace Execution Path:**
+- Don't treat symptoms. Find root cause.
+- Work backwards from error to origin.
+- Follow the data/state through the call stack.
+- Verify assumptions about when/where code runs.
+
+**Build Smart Fixes:**
+- Never skip/remove code to avoid problems.
+- Patch state BEFORE it's used.
+- Make problematic code work WITH your setup.
+- Verify the fix makes logical sense, not just "works."
+
+**Learn & Document:**
+- Each bug reveals a planning gap.
+- Document root cause and pattern for future reference.
+- Update architecture if pattern appears again.
+- Recognize missing "longsightedness" (state isolation issues, timing problems, etc.)
+
+**Example Pattern (Phase 1 Lesson):**
+Problem: TestClient creates test session but init_db() uses wrong database engine.
+Root Cause: Module-level `engine` variable wasn't patched before startup event.
+Fix: `monkeypatch.setattr(db_module, "engine", test_engine)` BEFORE TestClient creation.
+Pattern: Always check module-level state isolation in test fixtures.
+
+### 5. **Checkpoint System**
 After completing each phase:
 - Run full test suite: `pytest tests/ -v`
 - Manually test in browser if UI component
