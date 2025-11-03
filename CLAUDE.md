@@ -77,11 +77,61 @@ When a bug emerges, follow this discipline:
 - Update architecture if pattern appears again.
 - Recognize missing "longsightedness" (state isolation issues, timing problems, etc.)
 
-**Example Pattern (Phase 1 Lesson):**
-Problem: TestClient creates test session but init_db() uses wrong database engine.
-Root Cause: Module-level `engine` variable wasn't patched before startup event.
-Fix: `monkeypatch.setattr(db_module, "engine", test_engine)` BEFORE TestClient creation.
-Pattern: Always check module-level state isolation in test fixtures.
+**Documented Patterns (Lessons from Phases 1-2):**
+
+**Pattern 1: Module-Level Engine Patching (Phase 1)**
+```
+Problem: TestClient creates test session but init_db() uses wrong database engine
+Root Cause: Module-level `engine` variable wasn't patched before startup event runs
+Timeline: import app.database → creates engine → startup event uses engine
+Fix: monkeypatch.setattr(db_module, "engine", test_engine) BEFORE TestClient creation
+Prevention: Always identify when startup events run (before or after fixture setup)
+```
+
+**Pattern 2: ORM Session Lifecycle in Response Handlers (Phase 2)**
+```
+Problem: Returning ORM object after db.commit() fails with "object expired" error
+Root Cause: SQLAlchemy expires object attributes after commit. Pydantic tries to access
+           them, but can't reload from in-memory test database
+Timeline: db.flush() → get ID → db.commit() → object expires → try to access attributes
+Fix: Materialize all attributes into dict BEFORE commit:
+     attrs = {attr: getattr(obj, attr) for attr in [...]}
+     db.commit()
+     return attrs
+Prevention: For async endpoints returning ORM objects, always fetch dict representation
+            before transaction close, or use fresh query after commit
+```
+
+**Pattern 3: Module-Level Filesystem Path Patching (Phase 2)**
+```
+Problem: Tests pollute real backend/patients/ directory with test files
+Root Cause: PATIENTS_BASE_PATH defined at module level, not patched before routes imported
+Timeline: import routes.files → PATIENTS_BASE_PATH set to real path → tests use real path
+Fix: In fixture, import module THEN patch:
+     from app.routes import files as files_module
+     monkeypatch.setattr(files_module, "PATIENTS_BASE_PATH", tmp_path)
+Prevention: Identify all module-level constants that affect I/O. Create fixtures to patch
+            them. Document which modules need what patching in fixture dependencies.
+```
+
+**Pattern 4: Pydantic v2 Configuration (Phase 2)**
+```
+Problem: Deprecated Config class causes warnings and validation failures
+Root Cause: Pydantic v2 requires ConfigDict instead of nested Config class
+Fix: Replace:
+     class Config:
+         from_attributes = True
+     With:
+     model_config = ConfigDict(from_attributes=True)
+Prevention: For all Pydantic models, use model_config = ConfigDict(...) pattern
+```
+
+**Critical Testing Principles (Learned Hard Way):**
+1. **Capture state BEFORE operations change it** - Get values before commit, flush, or close
+2. **Patch module-level state BEFORE importing code that uses it** - Order matters
+3. **Test isolation = patch everything mutable** - DB engine, file paths, time, random
+4. **Session lifecycle awareness** - Know when objects expire (after commit)
+5. **Don't mock away the problem** - Make tests work WITH real behavior, not around it
 
 ### 5. **Checkpoint System**
 After completing each phase:
