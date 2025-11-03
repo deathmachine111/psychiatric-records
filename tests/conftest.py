@@ -76,3 +76,27 @@ def client(db: Session, monkeypatch) -> TestClient:
 
     # Clean up
     fastapi_app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def mock_patients_path(tmp_path, monkeypatch):
+    """
+    Mock the patients directory to use temporary location
+    Prevents test files from polluting the real backend/patients/ directory
+
+    This fixture patches PATIENTS_BASE_PATH in routes/files.py to use temp directory.
+    Tests using this fixture can verify files were saved correctly.
+
+    STATE ISOLATION: This is critical for preventing test files from polluting
+    the real filesystem. We patch BEFORE any routes/files code runs.
+    """
+    # Import the files module so we can patch its PATIENTS_BASE_PATH
+    from app.routes import files as files_module
+
+    # Patch PATIENTS_BASE_PATH to use the temp directory
+    monkeypatch.setattr(files_module, "PATIENTS_BASE_PATH", tmp_path)
+
+    # Create the patients base directory
+    tmp_path.mkdir(exist_ok=True)
+
+    yield tmp_path

@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import routes
-from app.routes import patients
+from app.routes import patients, files
 from app.database import init_db
 
 # Initialize FastAPI app
@@ -68,7 +68,7 @@ async def health_check():
 
 # Mount routers (Phase 1: Patients, Phase 2+: Others)
 app.include_router(patients.router, prefix="/api", tags=["patients"])
-# app.include_router(files.router, prefix="/api", tags=["files"])  # Phase 2
+app.include_router(files.router, prefix="/api", tags=["files"])  # Phase 2
 # app.include_router(processing.router, prefix="/api", tags=["processing"])  # Phase 5
 # app.include_router(notion.router, prefix="/api", tags=["notion"])  # Phase 5.5
 
