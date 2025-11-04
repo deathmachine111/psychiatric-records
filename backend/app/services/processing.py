@@ -1,6 +1,6 @@
 """
 Gemini AI Processing Service
-Handles transcription, OCR, and text cleaning using Google's Gemini API
+Handles transcription, OCR, and text cleaning using Google's Gemini 2.5 Pro API
 """
 import logging
 import os
@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 
 class GeminiProcessor:
     """
-    Handles file processing with Google Gemini API
+    Handles file processing with Google Gemini 2.5 Pro API
     Supports: Audio transcription, Image/PDF OCR, Text cleaning
+    Uses thinking capabilities for improved reasoning
     """
 
     def __init__(self, api_key: Optional[str] = None):
@@ -72,7 +73,7 @@ Preserve speaker turns and key clinical information.
 Output: Plain text only, no markdown or formatting."""
 
             # Generate transcription
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.5-pro")
             response = model.generate_content([prompt, audio_file])
 
             transcribed_text = response.text
@@ -123,7 +124,7 @@ Correct obvious typos while preserving clinical accuracy.
 Output: Plain text only, clean and organized."""
 
             # Generate OCR
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.5-pro")
             response = model.generate_content([prompt, image_file])
 
             extracted_text = response.text
@@ -176,7 +177,7 @@ Text to clean:
 {text_content}"""
 
             # Generate cleaned text
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.5-pro")
             response = model.generate_content(prompt)
 
             cleaned_text = response.text
