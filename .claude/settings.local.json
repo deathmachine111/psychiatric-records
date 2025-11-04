@@ -11,7 +11,9 @@
       "Bash(move:*)",
       "Bash(cat:*)",
       "WebSearch",
-      "Bash(claude mcp list:*)"
+      "Bash(claude mcp list:*)",
+      "Bash(pytest:*)",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "ask": []

@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import routes
-from app.routes import patients, files, metadata, processing
+from app.routes import patients, files, metadata, processing, notion
 from app.database import init_db
 
 # Initialize FastAPI app
@@ -71,7 +71,7 @@ app.include_router(patients.router, prefix="/api", tags=["patients"])
 app.include_router(files.router, prefix="/api", tags=["files"])  # Phase 2
 app.include_router(metadata.router, prefix="/api", tags=["metadata"])  # Phase 3
 app.include_router(processing.router, prefix="/api", tags=["processing"])  # Phase 5
-# app.include_router(notion.router, prefix="/api", tags=["notion"])  # Phase 5.5
+app.include_router(notion.router, prefix="/api", tags=["notion"])  # Phase 5.5
 
 if __name__ == "__main__":
     import uvicorn
