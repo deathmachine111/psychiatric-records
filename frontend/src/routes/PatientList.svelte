@@ -94,11 +94,10 @@
   {:else}
     <div class="grid gap-4">
       {#each patientsList as patient (patient.id)}
-        <div
-          class="bg-white rounded-lg shadow hover:shadow-md cursor-pointer transition p-6"
+        <button
+          class="bg-white rounded-lg shadow hover:shadow-md cursor-pointer transition p-6 text-left w-full"
           on:click={() => handleSelectPatient(patient)}
-          role="button"
-          tabindex="0"
+          type="button"
         >
           <div class="flex justify-between items-start">
             <div>
@@ -117,7 +116,7 @@
               Delete
             </button>
           </div>
-        </div>
+        </button>
       {/each}
     </div>
   {/if}

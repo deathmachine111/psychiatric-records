@@ -137,9 +137,11 @@ Prevention: For all Pydantic models, use model_config = ConfigDict(...) pattern
 After completing each phase:
 - Run full test suite: `pytest tests/ -v`
 - Manually test in browser if UI component
+- **UPDATE PROJECT_STATUS.md** - CRITICAL: Update status, test counts, and completion percentage
 - Commit changes: `git add . && git commit -m "Phase X complete"`
-- Document what works in progress log
 - Wait for user approval before next phase
+
+**⚠️ CRITICAL RULE: PROJECT_STATUS.md MUST be updated after EVERY phase completion.** This is the single source of truth for project visibility. Never skip this step or project status becomes unreliable.
 
 ---
 

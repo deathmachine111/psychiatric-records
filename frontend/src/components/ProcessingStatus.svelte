@@ -1,6 +1,5 @@
 <script>
   export let status = 'pending'
-  export let filename = ''
   export let errorMessage = ''
 
   function getStatusIcon(s) {

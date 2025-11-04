@@ -54,7 +54,6 @@
       <div class="mt-4">
         <ProcessingStatus
           status={file.processing_status}
-          filename={file.filename}
           errorMessage={file.error_message}
         />
       </div>

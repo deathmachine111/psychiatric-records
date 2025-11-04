@@ -1,0 +1,197 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.4, pytest-7.4.3, pluggy-1.6.0 -- C:\Users\soumy\projects\psychiatric-records\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\soumy\projects\psychiatric-records
+configfile: pytest.ini
+plugins: anyio-3.7.1, asyncio-0.21.1, cov-4.1.0, mock-3.12.0
+asyncio: mode=Mode.STRICT
+collecting ... collected 71 items
+
+tests/test_files.py::TestFileUpload::test_upload_audio_mp3_success PASSED [  1%]
+tests/test_files.py::TestFileUpload::test_upload_audio_wav_success PASSED [  2%]
+tests/test_files.py::TestFileUpload::test_upload_with_metadata PASSED    [  4%]
+tests/test_files.py::TestFileUpload::test_upload_invalid_file_type PASSED [  5%]
+tests/test_files.py::TestFileUpload::test_upload_image_jpg_success PASSED [  7%]
+tests/test_files.py::TestFileUpload::test_upload_image_png_success PASSED [  8%]
+tests/test_files.py::TestFileUpload::test_upload_pdf_success PASSED      [  9%]
+tests/test_files.py::TestFileUpload::test_upload_text_file_success PASSED [ 11%]
+tests/test_files.py::TestFileUpload::test_upload_markdown_file_success PASSED [ 12%]
+tests/test_files.py::TestFileUpload::test_upload_file_too_large PASSED   [ 14%]
+tests/test_files.py::TestFileUpload::test_upload_no_file_provided PASSED [ 15%]
+tests/test_files.py::TestFileUpload::test_upload_patient_not_found PASSED [ 16%]
+tests/test_files.py::TestFileUpload::test_upload_file_saved_to_correct_path PASSED [ 18%]
+tests/test_files.py::TestFileUpload::test_upload_database_entry_created PASSED [ 19%]
+tests/test_files.py::TestFileList::test_list_patient_files_empty PASSED  [ 21%]
+tests/test_files.py::TestFileList::test_list_patient_files_multiple PASSED [ 22%]
+tests/test_files.py::TestFileList::test_get_file_details_success PASSED  [ 23%]
+tests/test_files.py::TestFileList::test_get_file_details_not_found PASSED [ 25%]
+tests/test_files.py::TestFileDelete::test_delete_file_success PASSED     [ 26%]
+tests/test_files.py::TestFileDelete::test_delete_file_not_found PASSED   [ 28%]
+tests/test_metadata.py::TestMetadataFileCreation::test_metadata_created_on_patient_creation PASSED [ 29%]
+tests/test_metadata.py::TestMetadataFileCreation::test_metadata_created_on_first_file_upload PASSED [ 30%]
+tests/test_metadata.py::TestMetadataFileCreation::test_metadata_file_structure_valid PASSED [ 32%]
+tests/test_metadata.py::TestMetadataReadOperations::test_get_metadata_success PASSED [ 33%]
+tests/test_metadata.py::TestMetadataReadOperations::test_get_metadata_patient_not_found PASSED [ 35%]
+tests/test_metadata.py::TestMetadataReadOperations::test_get_metadata_file_not_found PASSED [ 36%]
+tests/test_metadata.py::TestMetadataReadOperations::test_get_metadata_invalid_json_on_disk PASSED [ 38%]
+tests/test_metadata.py::TestMetadataSyncOperations::test_metadata_synced_after_file_upload PASSED [ 39%]
+tests/test_metadata.py::TestMetadataSyncOperations::test_metadata_synced_after_file_deletion PASSED [ 40%]
+tests/test_metadata.py::TestMetadataSyncOperations::test_metadata_synced_after_patient_update PASSED [ 42%]
+tests/test_metadata.py::TestMetadataSyncOperations::test_metadata_file_list_includes_all_files PASSED [ 43%]
+tests/test_metadata.py::TestMetadataSyncOperations::test_metadata_file_order_consistent PASSED [ 45%]
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_success PASSED [ 46%]
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_invalid_schema PASSED [ 47%]
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_atomic_write PASSED [ 49%]
+tests/test_metadata.py::TestMetadataEdgeCases::test_metadata_with_special_characters_in_name PASSED [ 50%]
+tests/test_metadata.py::TestMetadataEdgeCases::test_metadata_recovery_from_corrupted_json PASSED [ 52%]
+tests/test_metadata.py::TestMetadataIntegration::test_metadata_reflects_all_file_operations PASSED [ 53%]
+tests/test_metadata.py::TestMetadataIntegration::test_metadata_deleted_with_patient PASSED [ 54%]
+tests/test_metadata.py::TestMetadataIntegration::test_metadata_migration_from_no_metadata PASSED [ 56%]
+tests/test_notion.py::TestNotionExportBasics::test_export_single_processed_file_to_notion_success PASSED [ 57%]
+tests/test_notion.py::TestNotionExportBasics::test_export_image_file_with_ocr_to_notion PASSED [ 59%]
+tests/test_notion.py::TestNotionExportBasics::test_export_all_patient_files_to_notion PASSED [ 60%]
+tests/test_notion.py::TestNotionExportErrors::test_export_file_not_found PASSED [ 61%]
+tests/test_notion.py::TestNotionExportErrors::test_export_patient_not_found PASSED [ 63%]
+tests/test_notion.py::TestNotionExportErrors::test_export_file_not_processed PASSED [ 64%]
+tests/test_notion.py::TestNotionExportErrors::test_export_notion_api_failure PASSED [ 66%]
+tests/test_notion.py::TestNotionExportContent::test_exported_content_includes_patient_info PASSED [ 67%]
+tests/test_notion.py::TestNotionExportContent::test_exported_metadata_includes_timestamps PASSED [ 69%]
+tests/test_patients.py::TestPatientCreate::test_create_patient_success PASSED [ 70%]
+tests/test_patients.py::TestPatientCreate::test_create_patient_duplicate_name PASSED [ 71%]
+tests/test_patients.py::TestPatientCreate::test_create_patient_missing_name PASSED [ 73%]
+tests/test_patients.py::TestPatientCreate::test_create_patient_empty_name PASSED [ 74%]
+tests/test_patients.py::TestPatientRead::test_get_all_patients_empty PASSED [ 76%]
+tests/test_patients.py::TestPatientRead::test_get_all_patients_multiple PASSED [ 77%]
+tests/test_patients.py::TestPatientRead::test_get_patient_by_id_success PASSED [ 78%]
+tests/test_patients.py::TestPatientRead::test_get_patient_by_id_not_found PASSED [ 80%]
+tests/test_patients.py::TestPatientUpdate::test_update_patient_success PASSED [ 81%]
+tests/test_patients.py::TestPatientUpdate::test_update_patient_not_found PASSED [ 83%]
+tests/test_patients.py::TestPatientUpdate::test_update_patient_invalid_data PASSED [ 84%]
+tests/test_patients.py::TestPatientDelete::test_delete_patient_success PASSED [ 85%]
+tests/test_patients.py::TestPatientDelete::test_delete_patient_not_found PASSED [ 87%]
+tests/test_processing.py::TestGeminiAudioTranscription::test_transcribe_audio_mp3_success PASSED [ 88%]
+tests/test_processing.py::TestGeminiAudioTranscription::test_transcribe_audio_wav_success PASSED [ 90%]
+tests/test_processing.py::TestGeminiAudioTranscription::test_transcribe_audio_file_not_found PASSED [ 91%]
+tests/test_processing.py::TestGeminiImageOCR::test_ocr_image_jpg_success PASSED [ 92%]
+tests/test_processing.py::TestGeminiImageOCR::test_ocr_pdf_success PASSED [ 94%]
+tests/test_processing.py::TestGeminiTextCleaning::test_clean_text_file_success PASSED [ 95%]
+tests/test_processing.py::TestGeminiTextCleaning::test_clean_markdown_file_success PASSED [ 97%]
+tests/test_processing.py::TestProcessingErrorHandling::test_processing_status_updates_to_processing PASSED [ 98%]
+tests/test_processing.py::TestProcessingErrorHandling::test_processing_handles_gemini_error PASSED [100%]
+
+============================== warnings summary ===============================
+backend\app\database.py:23
+  C:\Users\soumy\projects\psychiatric-records\backend\app\database.py:23: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+.venv\Lib\site-packages\pydantic\_internal\_config.py:268
+  C:\Users\soumy\projects\psychiatric-records\.venv\Lib\site-packages\pydantic\_internal\_config.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+backend\app\main.py:40
+  C:\Users\soumy\projects\psychiatric-records\backend\app\main.py:40: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv\Lib\site-packages\fastapi\applications.py:4547
+  C:\Users\soumy\projects\psychiatric-records\.venv\Lib\site-packages\fastapi\applications.py:4547: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/test_files.py: 52 warnings
+tests/test_metadata.py: 57 warnings
+tests/test_notion.py: 23 warnings
+tests/test_patients.py: 19 warnings
+tests/test_processing.py: 26 warnings
+  C:\Users\soumy\projects\psychiatric-records\.venv\Lib\site-packages\sqlalchemy\sql\schema.py:3592: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+tests/test_files.py: 11 warnings
+tests/test_metadata.py: 17 warnings
+tests/test_patients.py: 1 warning
+  C:\Users\soumy\projects\psychiatric-records\backend\app\services\metadata.py:279: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = datetime.utcnow()
+
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_success
+  C:\Users\soumy\projects\psychiatric-records\tests\test_metadata.py:394: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "created_date": datetime.utcnow().isoformat(),
+
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_success
+  C:\Users\soumy\projects\psychiatric-records\tests\test_metadata.py:395: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "updated_date": datetime.utcnow().isoformat(),
+
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_atomic_write
+  C:\Users\soumy\projects\psychiatric-records\tests\test_metadata.py:447: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "created_date": datetime.utcnow().isoformat(),
+
+tests/test_metadata.py::TestMetadataWriteOperations::test_update_metadata_atomic_write
+  C:\Users\soumy\projects\psychiatric-records\tests\test_metadata.py:448: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "updated_date": datetime.utcnow().isoformat(),
+
+tests/test_notion.py::TestNotionExportBasics::test_export_single_processed_file_to_notion_success
+  C:\Users\soumy\projects\psychiatric-records\tests\test_notion.py:38: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    date_processed=datetime.utcnow()
+
+tests/test_notion.py::TestNotionExportBasics::test_export_image_file_with_ocr_to_notion
+  C:\Users\soumy\projects\psychiatric-records\tests\test_notion.py:83: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    date_processed=datetime.utcnow()
+
+tests/test_notion.py::TestNotionExportBasics::test_export_all_patient_files_to_notion
+tests/test_notion.py::TestNotionExportBasics::test_export_all_patient_files_to_notion
+tests/test_notion.py::TestNotionExportBasics::test_export_all_patient_files_to_notion
+  C:\Users\soumy\projects\psychiatric-records\tests\test_notion.py:122: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    date_processed=datetime.utcnow()
+
+tests/test_notion.py::TestNotionExportContent::test_exported_metadata_includes_timestamps
+  C:\Users\soumy\projects\psychiatric-records\tests\test_notion.py:292: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    date_processed=datetime.utcnow()
+
+tests/test_processing.py::TestGeminiAudioTranscription::test_transcribe_audio_mp3_success
+tests/test_processing.py::TestGeminiAudioTranscription::test_transcribe_audio_wav_success
+tests/test_processing.py::TestGeminiImageOCR::test_ocr_image_jpg_success
+tests/test_processing.py::TestGeminiImageOCR::test_ocr_pdf_success
+tests/test_processing.py::TestGeminiTextCleaning::test_clean_text_file_success
+tests/test_processing.py::TestGeminiTextCleaning::test_clean_markdown_file_success
+tests/test_processing.py::TestProcessingErrorHandling::test_processing_status_updates_to_processing
+  C:\Users\soumy\projects\psychiatric-records\backend\app\routes\processing.py:115: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    db_file.date_processed = datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+
+---------- coverage: platform win32, python 3.12.4-final-0 -----------
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+backend\app\__init__.py                  1      0   100%
+backend\app\database.py                 18      4    78%   34-38
+backend\app\main.py                     33      6    82%   46-47, 53, 62, 77-78
+backend\app\models.py                   31      2    94%   28, 55
+backend\app\routes\__init__.py           0      0   100%
+backend\app\routes\files.py            176     51    71%   77, 83, 139, 147-148, 178-183, 197-199, 216, 258-261, 271-272, 282-290, 297-299, 325, 342-346, 370, 393-398, 422, 451-452, 466-467, 474-477, 484-486
+backend\app\routes\metadata.py          97     76    22%   36, 65-89, 122-164, 198-246, 275-299
+backend\app\routes\notion.py            78     26    67%   53-54, 71-72, 82-84, 115-117, 141-142, 154-155, 178, 186-188, 206-217
+backend\app\routes\patients.py         104     25    76%   59-62, 86-88, 117-119, 164-165, 174-176, 182-185, 227-228, 238-241
+backend\app\routes\processing.py        80     25    69%   55-56, 86-90, 110, 156-161, 181-214
+backend\app\schemas.py                  54      0   100%
+backend\app\services\__init__.py         3      0   100%
+backend\app\services\metadata.py       138     40    71%   65, 113-121, 164-171, 193, 200, 204, 210, 254-255, 299-307, 329-356, 379-383
+backend\app\services\notion.py          87     55    37%   12-14, 31, 33, 36, 74-135, 165-167, 182-184, 202-245, 259-289
+backend\app\services\processing.py      66     48    27%   34, 56-87, 107-138, 158-191
+------------------------------------------------------------------
+TOTAL                                  966    358    63%
+Coverage HTML written to dir htmlcov
+
+====================== 71 passed, 229 warnings in 13.27s ======================

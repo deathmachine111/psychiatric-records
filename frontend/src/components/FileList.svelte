@@ -79,7 +79,7 @@
   {:else}
     <div class="space-y-2">
       {#each files as file (file.id)}
-        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition cursor-pointer" on:click={() => handleSelectFile(file)}>
+        <button type="button" class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition cursor-pointer w-full text-left" on:click={() => handleSelectFile(file)}>
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center gap-3">
@@ -114,7 +114,7 @@
               </button>
             </div>
           </div>
-        </div>
+        </button>
       {/each}
     </div>
   {/if}
