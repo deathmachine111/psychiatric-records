@@ -753,66 +753,51 @@ Before committing, ask yourself:
 
 ---
 
-## 🧠 Advanced Development: MCP Servers & Strategic Research
+## 🧠 Advanced Development: Tools & Strategic Research
 
-### MCP (Model Context Protocol) Servers - Accelerate Development
+### Available Tools (Installed)
 
-**Available MCP Servers to Install:**
+**Installed MCP Servers:**
 
-After Phase 3 completion analysis, these MCP servers would prevent common debugging sessions:
-
-1. **FastAPI Source Code MCP Server** ⭐⭐⭐⭐⭐
+1. **Sequential Thinking MCP** ⭐⭐⭐⭐ (Installed - Phase 4+)
    ```
-   Purpose: Direct access to FastAPI internals
-   Prevents: 30-40 min debugging on TestClient behavior
-   Install: Will be added via Claude Code settings
-   Value: Understand request context, session lifecycle, dependency injection
-   ```
-
-2. **SQLAlchemy 2.0 MCP Server** ⭐⭐⭐⭐
-   ```
-   Purpose: Session lifecycle, transaction management, ORM behavior
-   Prevents: 20-30 min debugging on session state
-   Value: Understand autocommit behavior, when transactions begin/end
+   Purpose: Deep reasoning for complex debugging and analysis
+   Use: When stuck on tricky bugs or need architectural decisions
+   ⚠️ WARNING: Token-intensive! Use sparingly
+   Cost: ~3-5x more tokens than regular requests
+   Strategy: Reserve for Phase 5+ (Gemini integration, complex logic)
    ```
 
-3. **SQLite Documentation + Behavior MCP** ⭐⭐⭐
+2. **GitHub MCP** ⭐⭐⭐⭐ (Installed - Always available)
    ```
-   Purpose: :memory: database limitations, connection pooling
-   Prevents: 30-40 min researching in-memory DB issues
-   Value: Understand connection isolation, StaticPool vs SingletonThreadPool
+   Purpose: Direct access to FastAPI/SQLAlchemy source code and issues
+   Use: Search for framework patterns, read source, find solutions in issues
+   Cost: Minimal token overhead
+   Strategy: Use freely when investigating framework behavior
+   Example: "Query GitHub issues about SQLAlchemy session isolation"
    ```
 
-**Setup Instructions:**
+3. **WebSearch** ⭐⭐⭐⭐ (Built-in)
+   ```
+   Purpose: Current documentation, best practices, recent solutions
+   Use: Planning phase, hypothesis formation, validating approaches
+   Cost: Moderate (1-2x regular request)
+   Strategy: Use BEFORE starting code, not after failing
+   Example: "FastAPI file upload testing best practices"
+   ```
 
-The user should configure these in Claude Code settings (`.claude/settings.json` or Claude Code settings UI):
+**Usage Strategy:**
 
-```json
-{
-  "mcp": {
-    "servers": [
-      {
-        "name": "fastapi-docs",
-        "type": "stdio",
-        "command": "python -m mcp.servers.fastapi_docs",
-        "disabled": false
-      },
-      {
-        "name": "sqlalchemy-docs",
-        "type": "stdio",
-        "command": "python -m mcp.servers.sqlalchemy_docs",
-        "disabled": false
-      },
-      {
-        "name": "sqlite-docs",
-        "type": "stdio",
-        "command": "python -m mcp.servers.sqlite_docs",
-        "disabled": false
-      }
-    ]
-  }
-}
-```
+| Tool | When to Use | Frequency | Token Cost |
+|------|------------|-----------|-----------|
+| WebSearch | Before implementing features | ~1x per phase | Moderate |
+| GitHub MCP | When debugging framework issues | Ad-hoc | Minimal |
+| Sequential Thinking | Stuck >15 min on complex problem | Rare | High ⚠️ |
+
+**Token Budget Guidelines:**
+- WebSearch: ~1-2 searches per phase (planning + hypothesis)
+- GitHub MCP: Use as needed (low cost)
+- Sequential Thinking: Max 2-3 uses before reaching limits
 
 ### Strategic Web Search Methodology
 
@@ -924,10 +909,11 @@ Prevention: Understanding session lifecycle prevents this
    - Use this as starting point for Phase 4+ tests
 
 3. **CLAUDE.md (This File) - Updated Sections:**
-   - "Advanced Development: MCP Servers & Strategic Research"
+   - "Advanced Development: Tools & Strategic Research"
+   - Installed tools: Sequential Thinking MCP, GitHub MCP, WebSearch
+   - Token budget guidelines (avoid hitting limits)
    - Strategic web search methodology
    - Phase 3 lessons learned
-   - Root cause analysis patterns
 
 ---
 
@@ -984,9 +970,9 @@ pytest tests/ -v --cov
 5. **Manual testing required** - Automated tests aren't enough
 6. **Read error messages carefully** - They tell you what's wrong
 7. **Ask for help when stuck** - Don't waste time debugging alone
-8. **Search strategically, not reactively** - Research BEFORE assuming, not after failing
+8. **Search strategically** - Use WebSearch BEFORE implementing (1-2x per phase)
 9. **Review TESTING_PATTERNS.md** - Before writing tests for any new phase
-10. **Use MCP Servers** - When investigating framework behavior, consult source code via MCP first
+10. **Use tools wisely** - GitHub MCP (free), Sequential Thinking (rare, expensive)
 
 ---
 
@@ -1045,6 +1031,35 @@ pytest tests/ -v --cov
 
 ---
 
+### Session 2 (Phase 4 Initialization + Tool Setup) - 2025-11-04
+
+**Achievements:**
+- ✅ Evaluated ApiDog for TDD (conclusion: not helpful for this project)
+- ✅ Installed Sequential Thinking MCP (stdio, user scope)
+- ✅ Installed GitHub MCP (pre-existing, HTTP)
+- ✅ Updated CLAUDE.md with actual tools + token budgets
+- ✅ Documented tool usage strategy (prevent hitting limits)
+- ✅ Ready to start Phase 4: Image + Text Upload
+
+**Tools Now Available:**
+- Sequential Thinking MCP: Deep debugging (use sparingly, ~3-5x token cost)
+- GitHub MCP: Framework source + issues (use freely, minimal cost)
+- WebSearch: Planning phase, best practices (1-2x token cost)
+
+**Token Budget Strategy:**
+- WebSearch: ~1-2 per phase (planning only)
+- GitHub MCP: Ad-hoc, no limit
+- Sequential Thinking: Max 2-3 before hitting limits (reserved for Phase 5+)
+
+**Phase 4 Ready:**
+- Review TESTING_PATTERNS.md before writing tests
+- Use TEST_SCAFFOLD_TEMPLATE.md for test structure
+- WebSearch once at phase start for "FastAPI image/text upload best practices"
+- Apply file validation patterns from Phase 2
+
+---
+
 **Previous Sessions:**
 - Phase 1: Patient CRUD (13/13 tests) ✅
 - Phase 2: Audio Upload (13/15 tests) ✅ with known session isolation issues
+- Phase 3: Metadata Input (20/20 tests) ✅
