@@ -24,8 +24,20 @@
   async function handleSelectPatient(e) {
     selectedPatient = e.detail
     currentPage = 'detail'
-    // TODO: Load patient files from API
-    patientFiles = []
+
+    // Load patient files from API
+    try {
+      ui.setLoading(true)
+      const { filesAPI } = await import('./services/api')
+      const response = await filesAPI.list(selectedPatient.id)
+      patientFiles = response.data || []
+    } catch (err) {
+      console.error('Failed to load files:', err)
+      ui.addToast('Failed to load patient files', 'error')
+      patientFiles = []
+    } finally {
+      ui.setLoading(false)
+    }
   }
 
   function handleBackToList() {
@@ -49,23 +61,40 @@
   async function handleFileUpload(e) {
     const uploadedFiles = e.detail
     try {
-      // TODO: Connect to API endpoint for file upload
-      ui.addToast(`${uploadedFiles.length} file(s) uploaded`, 'success')
+      ui.setLoading(true)
+      const { filesAPI } = await import('./services/api')
+
+      // Upload each file
+      for (const file of uploadedFiles) {
+        await filesAPI.upload(selectedPatient.id, file)
+      }
+
       // Reload patient files
-      // patientFiles = await fetchPatientFiles(selectedPatient.id)
+      const response = await filesAPI.list(selectedPatient.id)
+      patientFiles = response.data || []
+      ui.addToast(`${uploadedFiles.length} file(s) uploaded successfully`, 'success')
     } catch (err) {
+      console.error('File upload error:', err)
       ui.addToast('Failed to upload files', 'error')
+    } finally {
+      ui.setLoading(false)
     }
   }
 
   async function handleFileDelete(e) {
     const fileId = e.detail
     try {
-      // TODO: Connect to API endpoint for file deletion
+      ui.setLoading(true)
+      const { filesAPI } = await import('./services/api')
+
+      await filesAPI.delete(selectedPatient.id, fileId)
       patientFiles = patientFiles.filter(f => f.id !== fileId)
-      ui.addToast('File deleted', 'success')
+      ui.addToast('File deleted successfully', 'success')
     } catch (err) {
+      console.error('File delete error:', err)
       ui.addToast('Failed to delete file', 'error')
+    } finally {
+      ui.setLoading(false)
     }
   }
 

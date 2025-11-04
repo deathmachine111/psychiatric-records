@@ -17,7 +17,8 @@
       "Bash(npm run build:*)",
       "Bash(npm install:*)",
       "Bash(npm run test:run:*)",
-      "WebFetch(domain:svelte.dev)"
+      "WebFetch(domain:svelte.dev)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
