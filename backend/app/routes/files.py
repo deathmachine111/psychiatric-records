@@ -24,7 +24,7 @@ router = APIRouter(prefix="/patients", tags=["files"])
 # Base path for patient files (can be patched in tests)
 PATIENTS_BASE_PATH = Path(__file__).parent.parent.parent / "patients"
 
-# Allowed audio MIME types (Phase 2 - audio only)
+# Allowed audio MIME types (Phase 2)
 ALLOWED_AUDIO_TYPES = {
     "audio/mpeg",      # .mp3
     "audio/mp3",       # .mp3 alternate
@@ -36,6 +36,26 @@ ALLOWED_AUDIO_TYPES = {
     "audio/aac",       # .aac
     "audio/x-m4a",     # .m4a
 }
+
+# Allowed image MIME types (Phase 4)
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg",      # .jpg, .jpeg
+    "image/jpg",       # .jpg alternate
+    "image/png",       # .png
+    "image/gif",       # .gif
+    "image/webp",      # .webp
+    "application/pdf", # .pdf (treated as image/document)
+}
+
+# Allowed text MIME types (Phase 4)
+ALLOWED_TEXT_TYPES = {
+    "text/plain",      # .txt
+    "text/markdown",   # .md
+    "text/x-markdown", # .md alternate
+}
+
+# All allowed file types
+ALLOWED_FILE_TYPES = ALLOWED_AUDIO_TYPES | ALLOWED_IMAGE_TYPES | ALLOWED_TEXT_TYPES
 
 # Maximum file size: 50MB
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB in bytes
@@ -131,13 +151,13 @@ async def upload_file(
             )
 
         # 4. Validate file type (MIME type)
-        if not file.content_type or file.content_type not in ALLOWED_AUDIO_TYPES:
+        if not file.content_type or file.content_type not in ALLOWED_FILE_TYPES:
             logger.warning(
                 f"Invalid file type: {file.content_type} for patient {patient_id}"
             )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"File type '{file.content_type}' is not supported. Allowed types: {', '.join(sorted(ALLOWED_AUDIO_TYPES))}"
+                detail=f"File type '{file.content_type}' is not supported. Allowed: audio, image, or text files"
             )
 
         # 5. Validate file size
@@ -190,8 +210,10 @@ async def upload_file(
                 file_type = "image"
             elif file.content_type.startswith("text/"):
                 file_type = "text"
+            elif file.content_type == "application/pdf":  # PDF treated as image
+                file_type = "image"
             else:
-                file_type = "audio"  # Default to audio for Phase 2
+                file_type = "audio"  # Default fallback
 
             # Create relative path for database storage
             relative_path = f"PT_{patient.name}/raw_files/{safe_filename}"

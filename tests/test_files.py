@@ -86,7 +86,7 @@ class TestFileUpload:
         assert response_data["user_metadata"] == "Second therapy session with parents"
 
     def test_upload_invalid_file_type(self, client, db, mock_patients_path):
-        """Test that non-audio files are rejected"""
+        """Test that unsupported file types are rejected"""
         from app.models import Patient
         patient = Patient(name="Invalid Type Patient")
         db.add(patient)
@@ -95,13 +95,117 @@ class TestFileUpload:
 
         patient_id = patient.id
 
-        fake_text = io.BytesIO(b"this is a text file")
-        files = {"file": ("document.txt", fake_text, "text/plain")}
+        fake_file = io.BytesIO(b"this is an executable")
+        files = {"file": ("malware.exe", fake_file, "application/x-executable")}
 
         response = client.post(f"/api/patients/{patient_id}/files", files=files)
 
         assert response.status_code == 400
         assert "not supported" in response.json()["detail"].lower()
+
+    def test_upload_image_jpg_success(self, client, db, mock_patients_path):
+        """Test uploading a valid JPG image file"""
+        from app.models import Patient
+        patient = Patient(name="JPG Image Patient")
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
+
+        patient_id = patient.id
+
+        # Create fake image file (minimal JPEG header)
+        fake_image = io.BytesIO(b"\xFF\xD8\xFF\xE0" + b"fake jpg image data")
+        files = {"file": ("intake_form.jpg", fake_image, "image/jpeg")}
+
+        response = client.post(f"/api/patients/{patient_id}/files", files=files)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["filename"] == "intake_form.jpg"
+        assert data["file_type"] == "image"
+        assert data["patient_id"] == patient_id
+
+    def test_upload_image_png_success(self, client, db, mock_patients_path):
+        """Test uploading a valid PNG image file"""
+        from app.models import Patient
+        patient = Patient(name="PNG Image Patient")
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
+
+        patient_id = patient.id
+
+        # Create fake image file (minimal PNG header)
+        fake_image = io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"fake png image data")
+        files = {"file": ("assessment.png", fake_image, "image/png")}
+
+        response = client.post(f"/api/patients/{patient_id}/files", files=files)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["filename"] == "assessment.png"
+        assert data["file_type"] == "image"
+
+    def test_upload_pdf_success(self, client, db, mock_patients_path):
+        """Test uploading a valid PDF file"""
+        from app.models import Patient
+        patient = Patient(name="PDF Patient")
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
+
+        patient_id = patient.id
+
+        # Create fake PDF file (minimal PDF header)
+        fake_pdf = io.BytesIO(b"%PDF-1.4\n" + b"fake pdf content")
+        files = {"file": ("medical_records.pdf", fake_pdf, "application/pdf")}
+
+        response = client.post(f"/api/patients/{patient_id}/files", files=files)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["filename"] == "medical_records.pdf"
+        assert data["file_type"] == "image"
+
+    def test_upload_text_file_success(self, client, db, mock_patients_path):
+        """Test uploading a valid text file"""
+        from app.models import Patient
+        patient = Patient(name="Text File Patient")
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
+
+        patient_id = patient.id
+
+        fake_text = io.BytesIO(b"Patient notes: session started at 10am")
+        files = {"file": ("notes.txt", fake_text, "text/plain")}
+
+        response = client.post(f"/api/patients/{patient_id}/files", files=files)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["filename"] == "notes.txt"
+        assert data["file_type"] == "text"
+
+    def test_upload_markdown_file_success(self, client, db, mock_patients_path):
+        """Test uploading a valid markdown file"""
+        from app.models import Patient
+        patient = Patient(name="Markdown Patient")
+        db.add(patient)
+        db.commit()
+        db.refresh(patient)
+
+        patient_id = patient.id
+
+        fake_md = io.BytesIO(b"# Session Notes\n- Patient reported improvement")
+        files = {"file": ("session_notes.md", fake_md, "text/markdown")}
+
+        response = client.post(f"/api/patients/{patient_id}/files", files=files)
+
+        assert response.status_code == 201
+        data = response.json()
+        assert data["filename"] == "session_notes.md"
+        assert data["file_type"] == "text"
 
     def test_upload_file_too_large(self, client, db, mock_patients_path):
         """Test that files > 50MB are rejected"""
