@@ -250,9 +250,18 @@ async def upload_file(
             }
             logger.info(f"File record created: {file_id} for patient {patient_id}")
 
-            # NOTE: Not calling db.commit() here intentionally!
-            # With autocommit=False, let the dependency override handle transaction commit
-            # This ensures TestClient can properly manage sessions
+            # IMPORTANT: Commit the transaction to persist the file record
+            # FastAPI + SQLAlchemy requires explicit db.commit() in endpoints for writes
+            try:
+                db.commit()
+                logger.info(f"Database commit successful for file {file_id}")
+            except Exception as commit_error:
+                logger.error(f"Commit failed for file {file_id}: {commit_error}", exc_info=True)
+                db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Failed to persist file record: {str(commit_error)}"
+                )
 
             # Sync metadata after successful file upload (Phase 3)
             try:
