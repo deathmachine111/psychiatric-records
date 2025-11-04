@@ -43,6 +43,10 @@
     })
   }
 
+  function handleSelectFile(file) {
+    dispatch('selectFile', file)
+  }
+
   function handleDelete(file) {
     if (confirm(`Delete ${file.filename}?`)) {
       dispatch('delete', file.id)
@@ -75,7 +79,7 @@
   {:else}
     <div class="space-y-2">
       {#each files as file (file.id)}
-        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition cursor-pointer" on:click={() => handleSelectFile(file)}>
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center gap-3">

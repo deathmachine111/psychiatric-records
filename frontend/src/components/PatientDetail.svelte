@@ -76,7 +76,7 @@
     <!-- File List Section -->
     <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-xl font-semibold text-gray-900 mb-6">Patient Files</h3>
-      <FileList {files} on:delete={handleFileDelete} />
+      <FileList {files} on:delete={handleFileDelete} on:selectFile />
     </div>
   </div>
 {:else}

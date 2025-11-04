@@ -101,4 +101,33 @@ describe('FileList Component', () => {
 
     expect(confirmCalled.value).toBe(true)
   })
+
+  it('dispatches selectFile event when file row clicked', async () => {
+    const { component, getByText } = render(FileList, { props: { files: mockFiles } })
+    const user = userEvent.setup()
+
+    let selectedFile = null
+    component.$on('selectFile', (event) => {
+      selectedFile = event.detail
+    })
+
+    // Click on the filename to select it
+    await user.click(getByText('session1.mp3'))
+
+    expect(selectedFile).not.toBeNull()
+    expect(selectedFile.id).toBe(1)
+    expect(selectedFile.filename).toBe('session1.mp3')
+  })
+
+  it('file row is visually interactive', () => {
+    const { getByText, container } = render(FileList, { props: { files: mockFiles } })
+
+    // Find the clickable file row div with cursor-pointer class
+    const fileRows = container.querySelectorAll('.cursor-pointer')
+    expect(fileRows.length).toBeGreaterThan(0)
+
+    // Should have cursor-pointer class indicating it's clickable
+    const firstRow = fileRows[0]
+    expect(firstRow).toHaveClass('cursor-pointer')
+  })
 })
