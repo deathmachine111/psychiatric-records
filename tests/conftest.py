@@ -101,17 +101,19 @@ def mock_patients_path(tmp_path, monkeypatch):
     Mock the patients directory to use temporary location
     Prevents test files from polluting the real backend/patients/ directory
 
-    This fixture patches PATIENTS_BASE_PATH in routes/files.py to use temp directory.
+    This fixture patches PATIENTS_BASE_PATH in routes/files.py and routes/processing.py to use temp directory.
     Tests using this fixture can verify files were saved correctly.
 
     STATE ISOLATION: This is critical for preventing test files from polluting
-    the real filesystem. We patch BEFORE any routes/files code runs.
+    the real filesystem. We patch BEFORE any routes code runs.
     """
-    # Import the files module so we can patch its PATIENTS_BASE_PATH
+    # Import the files and processing modules so we can patch their PATIENTS_BASE_PATH
     from app.routes import files as files_module
+    from app.routes import processing as processing_module
 
-    # Patch PATIENTS_BASE_PATH to use the temp directory
+    # Patch PATIENTS_BASE_PATH to use the temp directory in both modules
     monkeypatch.setattr(files_module, "PATIENTS_BASE_PATH", tmp_path)
+    monkeypatch.setattr(processing_module, "PATIENTS_BASE_PATH", tmp_path)
 
     # Create the patients base directory
     tmp_path.mkdir(exist_ok=True)
