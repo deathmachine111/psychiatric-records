@@ -5,7 +5,12 @@ export default defineConfig({
   plugins: [svelte({ hot: !process.env.VITEST })],
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: [],
+    environment: 'happy-dom',
+    setupFiles: ['./vitest-setup.js'],
+    server: {
+      deps: {
+        inline: ['@testing-library/dom']
+      }
+    }
   },
 })

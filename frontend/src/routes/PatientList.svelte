@@ -2,14 +2,17 @@
   import { onMount, createEventDispatcher } from 'svelte'
   import { patients } from '../stores/patients'
   import { ui } from '../stores/ui'
+  import Modal from '../components/Modal.svelte'
+  import PatientForm from '../components/PatientForm.svelte'
 
   const dispatch = createEventDispatcher()
 
-  let patientsList = []
   let loading = true
   let error = null
-  let showForm = false
-  let formData = { name: '', notes: '' }
+  let showCreateModal = false
+
+  // Reactive store access - automatically subscribes
+  $: patientsList = $patients
 
   onMount(async () => {
     await loadPatients()
@@ -28,24 +31,20 @@
     }
   }
 
-  patients.subscribe((p) => {
-    patientsList = p
-  })
-
-  async function handleCreatePatient() {
-    if (!formData.name.trim()) {
-      ui.addToast('Patient name is required', 'error')
-      return
-    }
+  async function handleFormSubmit(e) {
+    const { name, notes } = e.detail
 
     try {
-      await patients.createPatient(formData)
+      await patients.createPatient({ name, notes })
       ui.addToast('Patient created successfully', 'success')
-      formData = { name: '', notes: '' }
-      showForm = false
+      showCreateModal = false
     } catch (err) {
       ui.addToast('Failed to create patient', 'error')
     }
+  }
+
+  function handleFormCancel() {
+    showCreateModal = false
   }
 
   function handleSelectPatient(patient) {
@@ -70,50 +69,15 @@
     <h2 class="text-3xl font-bold text-gray-900">Patients</h2>
     <button
       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      on:click={() => (showForm = !showForm)}
+      on:click={() => (showCreateModal = true)}
     >
-      {showForm ? 'Cancel' : '+ New Patient'}
+      + New Patient
     </button>
   </div>
 
-  {#if showForm}
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-xl font-semibold mb-4">Create New Patient</h3>
-      <form on:submit|preventDefault={handleCreatePatient} class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Patient Name
-          </label>
-          <input
-            type="text"
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter patient name"
-            bind:value={formData.name}
-            required
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Notes
-          </label>
-          <textarea
-            class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter notes (optional)"
-            rows="3"
-            bind:value={formData.notes}
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Create Patient
-        </button>
-      </form>
-    </div>
-  {/if}
+  <Modal open={showCreateModal} title="Create New Patient" on:close={() => (showCreateModal = false)}>
+    <PatientForm mode="create" on:submit={handleFormSubmit} on:cancel={handleFormCancel} />
+  </Modal>
 
   {#if loading}
     <div class="text-center py-12">
