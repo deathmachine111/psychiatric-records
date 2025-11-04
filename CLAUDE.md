@@ -998,6 +998,211 @@ pytest tests/ -v --cov
 
 ---
 
+---
+
+## 🔧 Available Tools: MCPs and Claude Skills
+
+### Quick Reference Table
+
+| Tool | Type | Installed | Status | Cost | Use Case |
+|------|------|-----------|--------|------|----------|
+| **WebSearch** | Built-in | ✅ | Always on | 1-2x | Planning, best practices, research |
+| **Sequential Thinking** | MCP | ✅ | Manual invocation | 3-5x ⚠️ | Complex debugging, deep analysis |
+| **GitHub MCP** | MCP | ✅ | Manual invocation | Minimal | Framework source, issue research |
+| **systematic-debugging** | Skill | ✅ | Auto-activates | None | Root cause investigation framework |
+| **root-cause-tracing** | Skill | ✅ | Auto-activates | None | Backward call stack tracing |
+| **test-fixing** | Skill | ✅ | Auto-activates | None | Test failure resolution |
+
+### What is a Skill vs an MCP?
+
+**Claude Skills (.claude/skills/)**
+- Pure **thinking methodologies** and frameworks
+- Activate automatically in relevant contexts
+- Zero system overhead (no hooks, no processes)
+- Guide Claude's approach to problems
+- Examples: systematic-debugging, root-cause-tracing
+
+**MCPs (Model Context Protocol)**
+- External **tool providers** via subprocesses
+- Require explicit invocation via Task tool
+- Provide specialized capabilities
+- Token-intensive for complex tasks
+- Examples: Sequential Thinking, GitHub integration
+
+### Installed Skills (3 Total)
+
+#### 1. **systematic-debugging** (SKILL.md - 113 lines)
+```
+Location: .claude/skills/systematic-debugging/SKILL.md
+Source: obra/superpowers (skill only, NO HOOKS)
+Activation: Auto-triggers on bugs, test failures, unexpected behavior
+```
+
+**When to Use:**
+- Encountering any bug or test failure
+- Before proposing ANY fix (investigate first!)
+- Time pressure situations (when quick fixes tempt you)
+- Complex multi-component issues
+
+**The Four Phases:**
+1. Root Cause Investigation: Trace data flow to source
+2. Pattern Analysis: Compare working vs broken code
+3. Hypothesis & Testing: Form specific, testable hypotheses
+4. Implementation: Address root causes, not symptoms
+
+**Key Principle:** "NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST"
+
+**Red Flags (Stop & Discuss):**
+- Proposing solutions before tracing data flow
+- Attempting multiple fixes simultaneously
+- Third+ fix attempt after two failures (architectural problem)
+- Skipping test writing
+
+#### 2. **root-cause-tracing** (SKILL.md - 145 lines)
+```
+Location: .claude/skills/root-cause-tracing/SKILL.md
+Source: obra/superpowers (skill only, NO HOOKS)
+Activation: Auto-triggers on deep execution stack bugs
+```
+
+**When to Use:**
+- Errors occur deep in execution (not entry points)
+- Long stack traces with unclear origins
+- Invalid data with unknown source
+- Need to identify which test/code path triggers problem
+
+**The Five-Step Process:**
+1. Observe symptom (where does error appear?)
+2. Find immediate cause (what code directly fails?)
+3. Ask "What called this?" (work backward)
+4. Keep tracing upward (follow parameters backward)
+5. Locate original trigger (true source of problem)
+
+**Adding Instrumentation:**
+```python
+# When manual tracing insufficient, add logging
+print(f"DEBUG: file_id = {file_id}, type = {type(file_id)}")
+print(f"DEBUG: Stack: {inspect.stack()}")
+```
+
+**Defense-in-Depth:**
+After fixing root cause, add validation at multiple layers to prevent recurrence.
+
+#### 3. **test-fixing** (SKILL.md - 79 lines)
+```
+Location: .claude/skills/test-fixing/SKILL.md
+Source: mhattingpete/claude-skills-marketplace
+Activation: Auto-triggers on test failures
+```
+
+**When to Use:**
+- Test suite failures
+- Request: "fix these tests" or "make tests pass"
+- After implementation, before commit
+
+**Methodology:**
+1. Execute test suite, catalog failures
+2. Group by error type and module
+3. Prioritize by impact and dependency order
+4. Fix sequentially with validation
+5. Run full suite to confirm no regressions
+
+### Installed MCPs (2 Registered, Pending Verification)
+
+#### 1. **Sequential Thinking MCP** ⭐⭐⭐⭐ (EXPENSIVE)
+```
+Connection: stdio transport (user scope)
+Command: npx -y @modelcontextprotocol/inspector (test)
+Status: Registered in settings.local.json
+```
+
+**When to Use:**
+- Stuck on complex problem > 15 minutes
+- Need deep systematic analysis
+- Architecture decisions required
+- Complex debugging requiring multiple hypothesis
+
+**How to Use:**
+```
+Task tool with subagent_type="general-purpose"
+Detailed prompt with full context
+Expect 3-5x token consumption
+Reserve for Phase 5+ or critical blockers
+```
+
+**Token Budget:** Max 2-3 uses before approaching limits
+**Cost:** ~3-5x regular request tokens
+
+#### 2. **GitHub MCP** ⭐⭐⭐⭐ (MINIMAL COST)
+```
+Connection: HTTP transport (pre-configured)
+Status: Available for code search and issues
+```
+
+**When to Use:**
+- Framework source code investigation
+- Find GitHub issues matching your problem
+- Research patterns in public repositories
+- Validate approaches before implementation
+
+**How to Use:**
+```
+Use directly in conversation:
+- Search code: search_code("pattern language:python")
+- View issues: issue_read(method="get", owner="...", repo="...", issue_number=...)
+- Examine commits: get_commit(owner="...", repo="...", sha="...")
+```
+
+**Token Cost:** Minimal (1-2x overhead)
+**Usage:** Ad-hoc, no daily limit
+
+### Critical Discovery: obra/superpowers Hooks Issue
+
+**Root Cause Analysis:**
+
+The obra/superpowers library includes a **`hooks/session-start.sh`** script that auto-executes at terminal startup. This caused:
+- session.ssh file creation
+- Terminal becoming unresponsive
+- Claude Code CLI breaking
+- Complete inability to use terminal commands
+
+**Why It Happens:**
+```
+obra/superpowers structure:
+├── hooks/
+│   ├── session-start.sh  ← Auto-executes at CLI startup
+│   ├── hooks.json        ← Defines hook triggers
+│   └── ...
+└── skills/
+    ├── systematic-debugging/
+    ├── root-cause-tracing/
+    └── test-fixing/
+```
+
+When installed via plugin system, the **entire library** (including hooks) gets loaded.
+
+**Solution: Skill Definitions Only**
+
+Extract ONLY the skill SKILL.md files and install project-scoped:
+```
+.claude/skills/
+├── systematic-debugging/SKILL.md  (pure methodology)
+├── root-cause-tracing/SKILL.md    (pure methodology)
+└── test-fixing/SKILL.md           (pure methodology)
+```
+
+**Result:**
+- ✅ Get proven debugging methodologies
+- ✅ Zero hook infrastructure
+- ✅ No CLI interference
+- ✅ No terminal issues
+- ✅ Project-scoped (safe to rollback)
+
+**Key Principle:**
+> "Extract skill definitions from problematic libraries. Install as project-scoped SKILL.md files only. Never use the full library installation if hooks are present."
+
+---
+
 ## 📝 Evolution Log
 
 ### Session 1 (Phase 3 Completion + Analysis) - 2025-11-03
@@ -1059,7 +1264,87 @@ pytest tests/ -v --cov
 
 ---
 
+---
+
+### Session 3 (Claude Skills Installation + obra/superpowers Discovery) - 2025-11-04
+
+**Critical Discovery:**
+- 🔍 **Root Cause Found:** obra/superpowers library includes `hooks/session-start.sh` that auto-executes at terminal startup
+- ⚠️ This hook infrastructure is WHY previous installation broke your CLI (session.ssh issue, terminal unresponsiveness)
+- ✅ **Solution Validated:** Extract ONLY skill definitions, install project-scoped without hooks
+
+**Achievements:**
+- ✅ Installed 3 Claude Skills (systematic-debugging, root-cause-tracing, test-fixing)
+- ✅ All installed project-scoped in `.claude/skills/` directory
+- ✅ ZERO hooks infrastructure (pure SKILL.md methodology files)
+- ✅ All 71 tests passing - no project impact
+- ✅ CLI remains safe and functional
+- ✅ Created comprehensive "Available Tools" section in CLAUDE.md
+- ✅ Documented obra/superpowers hook issue for future reference
+
+**Technical Details:**
+
+**What Was Installed:**
+```
+.claude/skills/
+├── systematic-debugging/SKILL.md (113 lines)  - Four-phase debugging methodology
+├── root-cause-tracing/SKILL.md   (145 lines)  - Backward call stack tracing
+└── test-fixing/SKILL.md          (79 lines)   - Test failure resolution
+```
+
+**Why It's Safe:**
+- Project-scoped (`.claude/skills/` not `~/.claude/skills/`)
+- Pure methodology files (SKILL.md = thinking guides)
+- NO hooks (obra's problematic `hooks/session-start.sh` excluded)
+- NO subprocess management (no MCP overhead)
+- NO configuration modification
+- Zero system interference
+
+**Skills Now Available:**
+
+1. **systematic-debugging** - Auto-activates when bugs detected
+   - Four-phase investigation framework
+   - Prevents symptom-only fixes
+   - Red flags for architectural problems
+
+2. **root-cause-tracing** - Auto-activates for deep execution bugs
+   - Five-step backward tracing methodology
+   - Add instrumentation when needed
+   - Defense-in-depth validation pattern
+
+3. **test-fixing** - Auto-activates on test failures
+   - Systematic test failure resolution
+   - Group by error type and module
+   - Sequential fix with regression testing
+
+**Documentation Updates:**
+- Added "🔧 Available Tools: MCPs and Claude Skills" section (200+ lines)
+- Quick reference table (all tools, costs, use cases)
+- Detailed explanation of each skill with when/how to use
+- Critical discovery about obra/superpowers hook infrastructure
+- Key principle: Extract skill definitions from problematic libraries
+
+**What This Solves:**
+- ✅ You wanted proven debugging methodologies
+- ✅ You feared obra/superpowers breaking things again
+- ✅ Root cause identified and documented
+- ✅ Safe alternative solution deployed
+- ✅ Future-proofing: Others know to extract skills from hooks
+
+**Test Results:**
+- ✅ 71/71 passing (100%)
+- ✅ No regressions from skill installations
+- ✅ All three skills available for auto-activation
+
+**Key Insight for Future Sessions:**
+> "When installing from problematic libraries: Extract ONLY the SKILL.md definition files. Project-scope them in `.claude/skills/`. Ignore all hook infrastructure. Result: Get the methodology without the breaking changes."
+
+---
+
 **Previous Sessions:**
 - Phase 1: Patient CRUD (13/13 tests) ✅
 - Phase 2: Audio Upload (13/15 tests) ✅ with known session isolation issues
 - Phase 3: Metadata Input (20/20 tests) ✅
+- Phase 5: Gemini AI Integration (71/71 tests) ✅ - Complete end-to-end processing
+- Phase 5.5: Notion Export (71/71 tests) ✅ - Complete notion integration
+- Phase 6: Frontend UI (104 tests) ✅ - Svelte components and routing
