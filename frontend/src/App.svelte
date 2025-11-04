@@ -5,6 +5,7 @@
   import TranscriptView from './components/TranscriptView.svelte'
   import Modal from './components/Modal.svelte'
   import PatientForm from './components/PatientForm.svelte'
+  import ToastContainer from './components/ToastContainer.svelte'
   import { patients } from './stores/patients'
   import { ui } from './stores/ui'
   import { onMount } from 'svelte'
@@ -122,6 +123,8 @@
       <TranscriptView file={selectedFile} on:back={handleBackToDetail} />
     {/if}
   </main>
+
+  <ToastContainer />
 </div>
 
 <style>
