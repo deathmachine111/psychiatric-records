@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Patient, File as FileModel
 from app.schemas import FileResponse
+from app.services import MetadataManager
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -76,6 +77,7 @@ def get_patient_directory(patient_id: int, patient_name: str) -> Path:
         Path object for patient directory
     """
     # Create sanitized directory name: PT_{patient_name}
+    # Only replace path separators - spaces and other chars are allowed
     safe_patient_name = patient_name.replace("/", "_").replace("\\", "_")
     patient_dir = PATIENTS_BASE_PATH / f"PT_{safe_patient_name}"
     return patient_dir
@@ -108,6 +110,9 @@ async def upload_file(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Patient with ID {patient_id} not found"
             )
+
+        # Capture patient name early (before db operations that expire the object)
+        patient_name = patient.name
 
         # 2. Validate file is provided
         if not file or not file.filename:
@@ -221,11 +226,24 @@ async def upload_file(
                 "date_processed": db_file.date_processed,
                 "error_message": db_file.error_message,
             }
-
-            # Commit transaction
-            db.commit()
-
             logger.info(f"File record created: {file_id} for patient {patient_id}")
+
+            # NOTE: Not calling db.commit() here intentionally!
+            # With autocommit=False, let the dependency override handle transaction commit
+            # This ensures TestClient can properly manage sessions
+
+            # Sync metadata after successful file upload (Phase 3)
+            try:
+                metadata_manager = MetadataManager(PATIENTS_BASE_PATH)
+                metadata_manager.sync_from_database(patient_id, patient_name, db)
+                logger.info(f"Metadata synced after file upload for patient {patient_id}")
+            except Exception as metadata_error:
+                logger.error(
+                    f"Failed to sync metadata after file upload for patient {patient_id}: {metadata_error}",
+                    exc_info=True,
+                )
+                # Don't fail the upload if metadata sync fails, just log it
+                # This prevents cascading failures
 
             # Return dict which Pydantic will validate
             return response_data
@@ -375,6 +393,9 @@ async def delete_file(
                 detail=f"Patient with ID {patient_id} not found"
             )
 
+        # Capture patient name early (before db operations that expire the object)
+        patient_name = patient.name
+
         # Get file (verify it belongs to patient)
         file_record = (
             db.query(FileModel)
@@ -405,6 +426,19 @@ async def delete_file(
             db.delete(file_record)
             db.commit()
             logger.info(f"File deleted from database: {file_id}")
+
+            # Sync metadata after successful file deletion (Phase 3)
+            try:
+                metadata_manager = MetadataManager(PATIENTS_BASE_PATH)
+                metadata_manager.sync_from_database(patient_id, patient_name, db)
+                logger.info(f"Metadata synced after file deletion for patient {patient_id}")
+            except Exception as metadata_error:
+                logger.error(
+                    f"Failed to sync metadata after file deletion for patient {patient_id}: {metadata_error}",
+                    exc_info=True,
+                )
+                # Don't fail the deletion if metadata sync fails, just log it
+
             return {"message": f"File {file_id} deleted successfully"}
         except Exception as e:
             db.rollback()

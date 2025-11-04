@@ -3,7 +3,10 @@ Test Configuration and Fixtures
 Sets up test database and FastAPI test client
 """
 import sys
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Add backend to path so we can import app
 backend_path = str(Path(__file__).parent.parent / "backend")
@@ -15,8 +18,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
 
-# Create in-memory SQLite database for tests BEFORE importing app
-TEST_SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+# Create SQLite database for tests BEFORE importing app
+# Use file-based database instead of :memory: to avoid connection pool issues
+# with TestClient and transaction commits
+import tempfile
+import os
+test_db_dir = tempfile.mkdtemp()
+test_db_file = os.path.join(test_db_dir, "test.db")
+TEST_SQLALCHEMY_DATABASE_URL = f"sqlite:///{test_db_file}"
 test_engine = create_engine(
     TEST_SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
@@ -57,10 +66,18 @@ def client(db: Session, monkeypatch) -> TestClient:
     """
     # Import database module so we can patch it
     from app import database as db_module
+    from app.models import File
 
     def override_get_db():
         """Override dependency to use test database session"""
-        yield db
+        try:
+            yield db
+        finally:
+            # CRITICAL: Commit any pending changes after route handler finishes
+            # The route handler doesn't call commit(), so we must commit here
+            # This is necessary for transaction management in TestClient
+            if db.in_transaction():
+                db.commit()
 
     # Patch the database.engine to use test_engine
     # This ensures the startup event creates tables in the test database

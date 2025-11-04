@@ -753,6 +753,184 @@ Before committing, ask yourself:
 
 ---
 
+## 🧠 Advanced Development: MCP Servers & Strategic Research
+
+### MCP (Model Context Protocol) Servers - Accelerate Development
+
+**Available MCP Servers to Install:**
+
+After Phase 3 completion analysis, these MCP servers would prevent common debugging sessions:
+
+1. **FastAPI Source Code MCP Server** ⭐⭐⭐⭐⭐
+   ```
+   Purpose: Direct access to FastAPI internals
+   Prevents: 30-40 min debugging on TestClient behavior
+   Install: Will be added via Claude Code settings
+   Value: Understand request context, session lifecycle, dependency injection
+   ```
+
+2. **SQLAlchemy 2.0 MCP Server** ⭐⭐⭐⭐
+   ```
+   Purpose: Session lifecycle, transaction management, ORM behavior
+   Prevents: 20-30 min debugging on session state
+   Value: Understand autocommit behavior, when transactions begin/end
+   ```
+
+3. **SQLite Documentation + Behavior MCP** ⭐⭐⭐
+   ```
+   Purpose: :memory: database limitations, connection pooling
+   Prevents: 30-40 min researching in-memory DB issues
+   Value: Understand connection isolation, StaticPool vs SingletonThreadPool
+   ```
+
+**Setup Instructions:**
+
+The user should configure these in Claude Code settings (`.claude/settings.json` or Claude Code settings UI):
+
+```json
+{
+  "mcp": {
+    "servers": [
+      {
+        "name": "fastapi-docs",
+        "type": "stdio",
+        "command": "python -m mcp.servers.fastapi_docs",
+        "disabled": false
+      },
+      {
+        "name": "sqlalchemy-docs",
+        "type": "stdio",
+        "command": "python -m mcp.servers.sqlalchemy_docs",
+        "disabled": false
+      },
+      {
+        "name": "sqlite-docs",
+        "type": "stdio",
+        "command": "python -m mcp.servers.sqlite_docs",
+        "disabled": false
+      }
+    ]
+  }
+}
+```
+
+### Strategic Web Search Methodology
+
+**When to Search (Critical Timing):**
+
+Research conducted at SPECIFIC points prevents most debugging:
+
+1. **Planning Phase (Before Implementation)**
+   ```
+   Timing: Before writing ANY code for a new feature
+   Search: "[Framework] [feature] best practices"
+           "[Language] [pattern] common pitfalls"
+   Example: Before file upload: "FastAPI file upload SQLAlchemy testing best practices"
+   Result: Would find the :memory: SQLite issue immediately
+   Impact: Prevents 1-2 hours of debugging
+   ```
+
+2. **Hypothesis Formation (Before Testing)**
+   ```
+   Timing: When you suspect something is wrong
+   Search: "[Observed behavior] [framework] transaction lifecycle"
+   Example: "SQLAlchemy session commit TestClient isolation"
+   Result: Would find the autocommit=False behavior immediately
+   Impact: Prevents 30-60 minutes of empirical testing
+   ```
+
+3. **Before Each "Leap of Faith"**
+   ```
+   Timing: Before trying a creative fix that seems risky
+   Search: "[Fix idea] [framework] pattern"
+   Example: Before adding db.begin(): "SQLAlchemy commit db.begin() transaction"
+   Result: Validates approach before wasting time implementing it
+   Impact: Prevents 15-30 minutes of dead-end coding
+   ```
+
+4. **During Debugging (When Stuck > 10 Minutes)**
+   ```
+   Timing: As soon as you have a concrete hypothesis
+   Search: Keep hypothesis specific, not vague
+   Example: "SQLite in-memory database connection pool isolation pytest"
+   Not: "why is my test failing" (too vague)
+   Result: Validates root cause, prevents further investigation of symptoms
+   Impact: Prevents 30-60 minutes chasing wrong causes
+   ```
+
+**Search Query Formula:**
+
+```
+[Specific Observation] + [Framework/Language] + [Pattern Name]
+
+Good: "SQLAlchemy session state after commit TestClient FastAPI"
+Bad: "database issue"
+
+Good: "pytest fixture scope isolation database test"
+Bad: "tests not working"
+```
+
+**Web Search Results Assessment:**
+
+When you get search results, prioritize:
+1. Official documentation (10x value vs blog posts)
+2. GitHub issues showing exact problem (validate you're not alone)
+3. Stack Overflow answers with explanations (understand why)
+4. Medium/blog posts with code examples (implementation patterns)
+
+### Phase 3 Testing Lessons (Complete Analysis)
+
+**Pattern 1: Transaction Isolation with TestClient**
+```
+Problem: Data persists in route handler but disappears from test
+Root Cause: :memory: SQLite + TestClient connection isolation
+Solution Details: Use file-based SQLite (see TESTING_PATTERNS.md)
+Prevention: Search before choosing test database
+```
+
+**Pattern 2: Route Handler Commit Interference**
+```
+Problem: db.commit() in route, then dependency override can't see data
+Root Cause: autocommit=False starts new transaction after commit
+Solution Details: Don't commit in route, let dependency override handle it
+Prevention: Research FastAPI session management patterns upfront
+```
+
+**Pattern 3: SQLAlchemy Query Cache**
+```
+Problem: After flush/commit, query returns 0 results
+Root Cause: Session caches query results, doesn't refetch after external updates
+Solution Details: Call db.expire_all() before querying after other operations
+Prevention: Understanding session lifecycle prevents this
+```
+
+**See TESTING_PATTERNS.md for Complete Details** - Captured 8 hours of debugging insights
+
+### Reference Documentation Created
+
+**New Files to Review Before Phase 4+:**
+
+1. **TESTING_PATTERNS.md** ⭐⭐⭐⭐⭐
+   - Complete guide to testing FastAPI + SQLAlchemy + Pytest
+   - 11 critical patterns with examples
+   - Gotchas and common pitfalls
+   - Before implementing Phase 4+ tests, review this
+   - Saves 2-3 hours of debugging per new phase
+
+2. **TEST_SCAFFOLD_TEMPLATE.md** ⭐⭐⭐⭐
+   - Copy-paste templates for new test suites
+   - Patterns for CRUD, file upload, integration, services
+   - Complete conftest.py pattern
+   - Use this as starting point for Phase 4+ tests
+
+3. **CLAUDE.md (This File) - Updated Sections:**
+   - "Advanced Development: MCP Servers & Strategic Research"
+   - Strategic web search methodology
+   - Phase 3 lessons learned
+   - Root cause analysis patterns
+
+---
+
 ## 🚀 Getting Started
 
 ### First-Time Setup (Already Done)
@@ -806,6 +984,9 @@ pytest tests/ -v --cov
 5. **Manual testing required** - Automated tests aren't enough
 6. **Read error messages carefully** - They tell you what's wrong
 7. **Ask for help when stuck** - Don't waste time debugging alone
+8. **Search strategically, not reactively** - Research BEFORE assuming, not after failing
+9. **Review TESTING_PATTERNS.md** - Before writing tests for any new phase
+10. **Use MCP Servers** - When investigating framework behavior, consult source code via MCP first
 
 ---
 
@@ -825,6 +1006,45 @@ pytest tests/ -v --cov
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2025-11-03 (Post-Phase 3 Analysis)*
 *Claude Code Version: Latest*
-*Project Status: Phase 0 - Setup Complete*
+*Project Status: Phase 3 Complete (20/20 tests) ✅*
+
+---
+
+## 📝 Evolution Log
+
+### Session 1 (Phase 3 Completion + Analysis) - 2025-11-03
+
+**Achievements:**
+- ✅ Phase 3: 20/20 tests passing (100%)
+- ✅ Identified root cause: Transaction isolation with TestClient + :memory: SQLite
+- ✅ Fixed through strategic debugging and hypothesis-driven methodology
+- ✅ Created comprehensive TESTING_PATTERNS.md
+- ✅ Created TEST_SCAFFOLD_TEMPLATE.md
+- ✅ Updated CLAUDE.md with MCP and web search strategy
+
+**Key Insights Documented:**
+- Transaction lifecycle with SQLAlchemy autocommit=False
+- Session management patterns for FastAPI TestClient
+- Strategic web search methodology (timing and query formulation)
+- When to use MCP servers vs traditional documentation
+
+**Improvements for Phase 4+:**
+- Use file-based SQLite for tests (not :memory:)
+- Let dependency override manage commits (not route handlers)
+- Call db.expire_all() before querying after flush/commit
+- Search proactively before implementing (prevent 1-2 hours of debugging)
+- Use TEST_SCAFFOLD_TEMPLATE.md for new test suites
+
+**Technical Debt Resolved:**
+- Debug logging cleaned up
+- Path sanitization made consistent
+- Session lifecycle properly documented
+- Metadata sync verified with file integration
+
+---
+
+**Previous Sessions:**
+- Phase 1: Patient CRUD (13/13 tests) ✅
+- Phase 2: Audio Upload (13/15 tests) ✅ with known session isolation issues

@@ -66,3 +66,34 @@ class FileResponse(FileBase):
     transcribed_content: Optional[str] = Field(None, description="Transcribed/extracted text content")
     date_processed: Optional[datetime] = Field(None, description="When the file was processed")
     error_message: Optional[str] = Field(None, description="Error message if processing failed")
+
+
+# Metadata Schemas
+
+class MetadataFileEntry(BaseModel):
+    """Schema for file entry in metadata"""
+    file_id: int = Field(..., description="File ID")
+    filename: str = Field(..., description="Original filename")
+    type: str = Field(..., description="File type: audio, image, text")
+    uploaded_date: datetime = Field(..., description="When uploaded")
+    user_metadata: Optional[str] = Field(None, description="User-provided metadata")
+    processing_status: str = Field(..., description="Processing status")
+
+
+class MetadataCreate(BaseModel):
+    """Schema for creating/updating patient metadata"""
+    model_config = ConfigDict(from_attributes=True)
+
+    notes: Optional[str] = Field(None, min_length=0, description="Patient-level notes")
+
+
+class MetadataResponse(BaseModel):
+    """Schema for metadata response"""
+    model_config = ConfigDict(from_attributes=True)
+
+    patient_id: int = Field(..., description="Patient ID")
+    patient_name: str = Field(..., description="Patient name")
+    created_date: datetime = Field(..., description="When metadata was created")
+    updated_date: datetime = Field(..., description="When metadata was last updated")
+    notes: Optional[str] = Field(None, description="Patient-level notes")
+    files: list[MetadataFileEntry] = Field(default_factory=list, description="List of files")

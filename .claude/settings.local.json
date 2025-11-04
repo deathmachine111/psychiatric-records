@@ -7,7 +7,11 @@
       "Bash(set PYTHONPATH=C:Userssoumyprojectspsychiatric-recordsbackend:*)",
       "Bash(python:*)",
       "Bash(timeout 5 python:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(move:*)",
+      "Bash(cat:*)",
+      "WebSearch",
+      "Bash(claude mcp list:*)"
     ],
     "deny": [],
     "ask": []

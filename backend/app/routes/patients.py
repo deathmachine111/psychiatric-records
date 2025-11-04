@@ -3,6 +3,7 @@ Patient API Routes
 Endpoints for patient CRUD operations
 """
 from fastapi import APIRouter, Depends, HTTPException, status
+from pathlib import Path
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 import logging
@@ -10,12 +11,16 @@ import logging
 from app.database import get_db
 from app.models import Patient
 from app.schemas import PatientCreate, PatientUpdate, PatientResponse, PatientDetailResponse
+from app.services import MetadataManager
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
 # Create router
 router = APIRouter(prefix="/patients", tags=["patients"])
+
+# Base path for patient files (can be patched in tests)
+PATIENTS_BASE_PATH = Path(__file__).parent.parent.parent / "patients"
 
 
 @router.post("", response_model=PatientResponse, status_code=status.HTTP_201_CREATED)
@@ -150,6 +155,19 @@ async def update_patient(
         db.refresh(db_patient)
 
         logger.info(f"Updated patient: {patient_id}")
+
+        # Sync metadata after patient update (Phase 3)
+        try:
+            metadata_manager = MetadataManager(PATIENTS_BASE_PATH)
+            metadata_manager.sync_from_database(patient_id, db_patient.name, db)
+            logger.info(f"Metadata synced after patient update for patient {patient_id}")
+        except Exception as metadata_error:
+            logger.error(
+                f"Failed to sync metadata after patient update for patient {patient_id}: {metadata_error}",
+                exc_info=True,
+            )
+            # Don't fail the update if metadata sync fails, just log it
+
         return db_patient
 
     except IntegrityError as e:
@@ -192,11 +210,27 @@ async def delete_patient(
                 detail=f"Patient with ID {patient_id} not found"
             )
 
+        # Store patient name before deletion for metadata cleanup
+        patient_name = db_patient.name
+
         # Delete patient
         db.delete(db_patient)
         db.commit()
 
         logger.info(f"Deleted patient: {patient_id}")
+
+        # Delete metadata after patient deletion (Phase 3)
+        try:
+            metadata_manager = MetadataManager(PATIENTS_BASE_PATH)
+            metadata_manager.delete_metadata(patient_id, patient_name)
+            logger.info(f"Metadata deleted for patient {patient_id}")
+        except Exception as metadata_error:
+            logger.error(
+                f"Failed to delete metadata for patient {patient_id}: {metadata_error}",
+                exc_info=True,
+            )
+            # Don't fail the patient deletion if metadata cleanup fails, just log it
+
         return {"message": f"Patient {patient_id} deleted successfully"}
 
     except HTTPException:
