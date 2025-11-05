@@ -9,7 +9,7 @@ describe('PatientForm Component', () => {
     expect(container.querySelector('input[type="text"]')).toBeInTheDocument()
   })
 
-  it('renders form with notes textarea', () => {
+  it('renders form with patient description textarea', () => {
     const { container } = render(PatientForm, { props: { mode: 'create' } })
     expect(container.querySelector('textarea')).toBeInTheDocument()
   })
@@ -25,15 +25,15 @@ describe('PatientForm Component', () => {
   })
 
   it('populates form with initial data in edit mode', () => {
-    const initialData = { name: 'John Doe', notes: 'Initial notes' }
+    const initialData = { name: 'John Doe', patient_description: 'Initial notes' }
     const { container } = render(PatientForm, {
       props: { mode: 'edit', data: initialData }
     })
     const nameInput = container.querySelector('input[type="text"]')
-    const notesTextarea = container.querySelector('textarea')
+    const descriptionTextarea = container.querySelector('textarea')
 
     expect(nameInput.value).toBe('John Doe')
-    expect(notesTextarea.value).toBe('Initial notes')
+    expect(descriptionTextarea.value).toBe('Initial notes')
   })
 
   it('dispatches submit event with form data', async () => {
@@ -48,15 +48,15 @@ describe('PatientForm Component', () => {
     })
 
     const nameInput = container.querySelector('input[type="text"]')
-    const notesTextarea = container.querySelector('textarea')
+    const descriptionTextarea = container.querySelector('textarea')
 
     await user.type(nameInput, 'Jane Smith')
-    await user.type(notesTextarea, 'Test notes')
+    await user.type(descriptionTextarea, 'Test notes')
     await user.click(getByText(/Save|Create/))
 
     expect(submitData).toEqual({
       name: 'Jane Smith',
-      notes: 'Test notes'
+      patient_description: 'Test notes'
     })
   })
 

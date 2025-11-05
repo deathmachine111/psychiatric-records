@@ -8,7 +8,7 @@
 
   let formData = {
     name: data?.name || '',
-    notes: data?.notes || ''
+    patient_description: data?.patient_description || ''
   }
 
   let errors = {
@@ -33,13 +33,13 @@
 
     dispatch('submit', {
       name: formData.name,
-      notes: formData.notes
+      patient_description: formData.patient_description
     })
 
     // Reset form after submit
     formData = {
       name: '',
-      notes: ''
+      patient_description: ''
     }
     errors.name = ''
   }
@@ -47,7 +47,7 @@
   function handleCancel() {
     formData = {
       name: data?.name || '',
-      notes: data?.notes || ''
+      patient_description: data?.patient_description || ''
     }
     errors.name = ''
     dispatch('cancel')
@@ -73,13 +73,13 @@
   </div>
 
   <div>
-    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
-      Notes (Optional)
+    <label for="patient_description" class="block text-sm font-medium text-gray-700 mb-1">
+      Patient Description (Optional)
     </label>
     <textarea
-      id="notes"
-      bind:value={formData.notes}
-      placeholder="Add any notes about this patient"
+      id="patient_description"
+      bind:value={formData.patient_description}
+      placeholder="Add description about this patient"
       rows="4"
       class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
     />

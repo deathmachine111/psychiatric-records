@@ -5,6 +5,7 @@
 
   let fileInput
   let selectedFiles = []
+  let fileMetadata = ''
   let error = ''
 
   function handleFileSelect(event) {
@@ -26,17 +27,19 @@
     // Get actual File objects from input
     const files = Array.from(fileInput.files)
 
-    dispatch('upload', files)
+    dispatch('upload', { files, metadata: fileMetadata })
 
     // Clear the input and selected files
     fileInput.value = ''
     selectedFiles = []
+    fileMetadata = ''
     error = ''
   }
 
   function handleCancel() {
     fileInput.value = ''
     selectedFiles = []
+    fileMetadata = ''
     error = ''
     dispatch('cancel')
   }
@@ -117,6 +120,19 @@
         {/each}
       </ul>
     </div>
+
+    <div class="mt-4">
+      <label for="file-metadata" class="block text-sm font-medium text-gray-700 mb-1">
+        File Notes (Optional)
+      </label>
+      <textarea
+        id="file-metadata"
+        bind:value={fileMetadata}
+        placeholder="Add notes about these files (e.g., Session date, context, patient state)"
+        rows="3"
+        class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
   {/if}
 
   {#if error}
@@ -146,6 +162,7 @@
 
 <style>
   :global(.drag-over) {
-    @apply border-blue-500 bg-blue-50;
+    border-color: rgb(59 130 246) !important;
+    background-color: rgb(239 246 255) !important;
   }
 </style>

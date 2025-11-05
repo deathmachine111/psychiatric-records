@@ -45,9 +45,9 @@ describe('FileUpload Component', () => {
     const { component, container, getByText } = render(FileUpload)
     const user = userEvent.setup()
 
-    let uploadedFiles = null
+    let uploadData = null
     component.$on('upload', (event) => {
-      uploadedFiles = event.detail
+      uploadData = event.detail
     })
 
     const input = container.querySelector('input[type="file"]')
@@ -61,8 +61,10 @@ describe('FileUpload Component', () => {
     const uploadBtn = getByText(/Upload/i)
     await user.click(uploadBtn)
 
-    expect(uploadedFiles).toBeDefined()
-    expect(uploadedFiles.length).toBe(1)
+    expect(uploadData).toBeDefined()
+    expect(uploadData.files).toBeDefined()
+    expect(uploadData.files.length).toBe(1)
+    expect(uploadData.metadata).toBeDefined()
   })
 
   it('clears selected files after upload', async () => {
